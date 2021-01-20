@@ -9,7 +9,8 @@ int main(){
     cin >> n;
     for(int a = 0; a < n; a++){
         int b, c;
-        cin >> b >> c;      // b = n (# of strings), c = m (# of char in each string)
+        // b = # of strings, c = # of char in each string
+        cin >> b >> c;
         vector<int> vec(0);
         // set vector vec to all 0's for this case;
         vec.resize(c);
@@ -18,15 +19,18 @@ int main(){
         for(int i = 0; i < b; i++){
             string str;
             cin >> str;
-            //bStrings.push_back(str);
             // loop through each binary char in each string
             for(int j = 0; j < str.size(); j++){
+                // if the bString at j is a 1, add 1 to vec[j] 
                 if(str[j] == '1'){
                     vec[j] += 1;
                 }
             }
         }
+        // loop through vec
         for(int iter = 0; iter < vec.size(); iter++){
+            // if vec[iter] >= half the size of # of strings then print 1
+            // otherwise print 0 as that string
             double half = double(b)/2.0;
             if(vec[iter] >= half){
                 cout << '1';
@@ -38,7 +42,6 @@ int main(){
         cout << endl;
 
     }
-
 
     return 0;
 }
