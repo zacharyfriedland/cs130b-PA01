@@ -30,23 +30,25 @@ int main(){
         enemies[pairTwo-1].push_back(pairOne);
     }
 
-    int count = 0;
     for(int s = 0; s < groupOne.size(); s++){
         int iter = 0;
+        int count = 0;
         while(iter < groupOne.size()){
-            // cout << "s: " << s << " iter: " << iter << " count: " << count << endl;
             if(iter != s){
                 // if solider is found in groupOne[s] enemy list
                 if(find(enemies[groupOne[s]-1].begin(), enemies[groupOne[s]-1].end(), groupOne[iter]) != enemies[groupOne[s]-1].end()){
                     // enemy count += 1
                     count++;
+                    // cout << "s: " << s << " iter: " << iter << " soldier: " << groupOne[s] << " count: " << count << endl;
                     if(count > 1){
                         // put this value into groupTwo
                         groupTwo.push_back(groupOne[s]);
                         // delete value from groupOne
                         groupOne.erase(remove(groupOne.begin(), groupOne.end(), groupOne[s]), groupOne.end());
                         //perform check here
-                        // if(there is an enemy of groupOne[s])
+                        // if(***there is an enemy of groupOne[s]***){
+                        //     see if that enemy
+                        // }
 
 
                         // ----------
