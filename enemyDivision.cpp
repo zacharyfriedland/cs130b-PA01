@@ -26,6 +26,23 @@ int findOneEnemy(int origIndex, vector<int> v, vector<vector<int>> enemies){
     return -1;
 }
 
+bool findEnemies(int culpritIndex, vector<int> v, vector<vector<int>> enemies){
+    int count = 0;
+    for(int i = 0; i < v.size(); i++){
+        if(i != culpritIndex){
+            // if there is more than one enemy then we must move the culprit
+            if(find(enemies[v[culpritIndex]-1].begin(), enemies[v[culpritIndex]-1].end(), v[i]) != enemies[v[culpritIndex]-1].end()){
+                count++;
+                cout << "found " << count << " enemies" << endl;
+                if(count > 1){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 
 int main(){
     int soldiers; // n 
@@ -67,12 +84,12 @@ int main(){
                         // findOneEnemy returns index of culprit
                         int hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
                         // TO DO =================================
-                        // if(hasEnemy > 0){
-                        //     bool enemyHasEnemies = findEnemies(culprit, groupTwo);
-                        // }
-                        // else{
-                        //     bool enemyHasEnemies = false;
-                        // }
+                        if(hasEnemy >= 0){
+                            bool enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
+                        }
+                        else{
+                            bool enemyHasEnemies = false;
+                        }
                         // =======================================
                         //perform check here
                         // if(***there is an enemy1 of groupOne[s]***){
