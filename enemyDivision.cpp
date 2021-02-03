@@ -7,7 +7,6 @@ using namespace std;
 
 
 void switchGroups(int indexToBeMoved, vector<int>& from, vector<int>& destination){
-    // must figure out indexToBeMoved
     destination.push_back(from[indexToBeMoved]);
     from.erase(remove(from.begin(), from.end(), from[indexToBeMoved]), from.end());
 }
@@ -18,7 +17,6 @@ int findOneEnemy(int origIndex, vector<int> v, vector<vector<int>> enemies){
         if(i != origIndex){
             // if v[i] is one of the original index's enemies, return the index (it is the culprit)
             if(find(enemies[v[origIndex]-1].begin(), enemies[v[origIndex]-1].end(), v[i]) != enemies[v[origIndex]-1].end()){
-                cout << "found the culprit, index is: " << i << " and v[i] = " << v[i] << endl;
                 return i;
             }
         }
@@ -33,7 +31,6 @@ bool findEnemies(int culpritIndex, vector<int> v, vector<vector<int>> enemies){
             // if there is more than one enemy then we must move the culprit
             if(find(enemies[v[culpritIndex]-1].begin(), enemies[v[culpritIndex]-1].end(), v[i]) != enemies[v[culpritIndex]-1].end()){
                 count++;
-                cout << "found " << count << " enemies" << endl;
                 if(count > 1){
                     return true;
                 }
@@ -72,7 +69,6 @@ int main(){
                 if(find(enemies[groupOne[s]-1].begin(), enemies[groupOne[s]-1].end(), groupOne[iter]) != enemies[groupOne[s]-1].end()){
                     // enemy count += 1
                     count++;
-                    // cout << "s: " << s << " iter: " << iter << " soldier: " << groupOne[s] << " count: " << count << endl;
                     if(count > 1){
                         // always starts from groupTwo to groupOne if switchback needed
                         int fromGroupOne = -1;
@@ -80,45 +76,38 @@ int main(){
                         groupTwo.push_back(groupOne[s]);
                         // delete value from groupOne
                         groupOne.erase(remove(groupOne.begin(), groupOne.end(), groupOne[s]), groupOne.end());
-                        // bool hasEnemies = false;
-                        // findOneEnemy returns index of culprit
+                        // findOneEnemy returns index of culprit = hasEnemy
                         int hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
-                        // TO DO =================================
+                        bool enemyHasEnemies = false;
                         if(hasEnemy >= 0){
-                            bool enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
+                            enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
                         }
-                        else{
-                            bool enemyHasEnemies = false;
+                        while(enemyHasEnemies){
+                            if(fromGroupOne > 0){
+                                switchGroups(hasEnemy, groupOne, groupTwo);
+                                fromGroupOne *= -1;
+                                hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
+                                if(hasEnemy >= 0){
+                                    enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
+                                }
+                                else{
+                                    enemyHasEnemies = false;
+                                    hasEnemy = -1;
+                                }
+                            }
+                            else{
+                                switchGroups(hasEnemy, groupTwo, groupOne);
+                                fromGroupOne *= -1;
+                                hasEnemy = findOneEnemy(groupOne.size()-1, groupOne, enemies);
+                                if(hasEnemy >= 0){
+                                    enemyHasEnemies = findEnemies(hasEnemy, groupOne, enemies);
+                                }
+                                else{
+                                    enemyHasEnemies = false;
+                                    hasEnemy = -1;
+                                }
+                            }
                         }
-                        // =======================================
-                        //perform check here
-                        // if(***there is an enemy1 of groupOne[s]***){
-                        //     if( enemy1 has one other enemy in current group){
-                        //          move enemy1 to other group
-                        //     }
-                        // }
-                        // TO DO======================================
-                        // while(enemyHasEnemies){
-                        //     if(fromGroupOne > 0){
-                        //         switchGroups(toBeMoved, groupOne, groupTwo);
-                        //         fromGroupOne *= -1;
-                        //         hasEnemy = findOneEnemy(orig, groupTwo);
-                        //         if(hasEnemy){
-                        //             enemyHasEnemies = findEnemies(culprit, groupTwo);
-                        //         }
-                        //     }
-                        //     else{
-                        //         switchGroups(toBeMoved, groupTwo, groupOne);
-                        //         fromGroupOne *= -1;
-                        //         hasEnemy = findOneEnemy(orig, groupOne);
-                        //         if(hasEnemy){
-                        //             enemyHasEnemies = findEnemies(culprit, groupOne);
-                        //         }
-                        //     }
-                        // }
-                        // ========================================
-
-                        // ----------
                         fromGroupOne = -1;
                         s--;
                         iter = groupOne.size()+1;
@@ -155,16 +144,6 @@ int main(){
         }
         cout << endl;
     }
-    
-    
-
-    // for(int z = 0; z < enemies.size(); z++){
-    //     cout << "Index: " << z << " Soldier: " << z+1 << " Enemies: ";
-    //     for(int y = 0; y < enemies[z].size(); y++){
-    //         cout << enemies[z][y] << " ";
-    //     }
-    //     cout << endl;
-    // }
 
     return 0;
 }
