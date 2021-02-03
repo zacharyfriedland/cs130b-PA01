@@ -63,6 +63,9 @@ int main(){
         }
     }
     // cout << "groupTwo: ";
+    if(groupTwo.size() > 0){
+        cout << "2" << endl;
+    }
     for(int j = 0; j < groupTwo.size(); j++){
         cout << groupTwo[j] << " ";
     }
