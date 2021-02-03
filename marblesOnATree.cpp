@@ -1,75 +1,70 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 using namespace std;
 
 
-class Box{
+class Node{
     public:
-        vector<Box*> children;
-        int marbleCount; // numMarbles
-        int marbleAmount;// marbleDiff
-        bool parent;
+        int vertexNum; // vertex number
+        int marbleCount; // # of marbles vertex has
+        vector<int> children; // holds children of each Node
 };
 
-int findMoves(Box* n)
-{
-    if (n->children.size() == 0)
-    {
-        n->marbleAmount = n->marbleCount - 1;
-        
-        return abs(n->marbleAmount);
-    }
-    
-    int count = 0;
+pair<int, int> findNecessaryMarbles(vector<Node>& n , int rootVertex){
+    int parentIndex = rootVertex-1;
+    int sum = 0;
+    int def = 0;
+    pair<int, int> p;
 
-    
-    for (int i = 0; i < n->children.size(); i++){
-        count += findMoves(n->children[i]);
-        n->marbleAmount = n->marbleAmount + n->children[i]->marbleAmount; 
+    for (int i = 0; i < n[parentIndex].children.size(); i++){
+        p = findNecessaryMarbles(n, n[parentIndex].children[i]);
+        sum += p.first;
+        def += p.second;
     }
-    
-    n->marbleAmount = n->marbleAmount + n->marbleCount - 1;
-    count += abs(n->marbleAmount);
-    
-    return count;
+    // if the node has no children, return marbleCount-1    
+    if(n[parentIndex].children.size() == 0){
+        return make_pair(abs(n[parentIndex].marbleCount-1), n[parentIndex].marbleCount-1);
+    }
+    else{
+        def = def + n[parentIndex].marbleCount - 1;
+        sum = sum + abs(def);
+    }
+
+    return make_pair(sum, def);
 }
+    
 
-int main()
-{
+int main(){
     int n;
     cin >> n;
     while(n != 0){
-        vector<Box> nodes(n);        
-        for (int i = 0; i < n; i++){
+        vector<Node> vec(n);
+        vector<int> findRoot;
+        for(int z = 1; z <= n; z++){
+            findRoot.push_back(z);
+        }
+        for(int i = 0; i < n; i++){
             int vertex;
-            int marbleAmount;
+            int numMarbles;
             int childrenNum;
-            cin >> vertex >> marbleAmount >> childrenNum;
-            nodes[vertex-1].marbleCount = marbleAmount;
+            cin >> vertex >> numMarbles >> childrenNum;
+            vec[i].vertexNum = vertex;
+            vec[i].marbleCount = numMarbles;
 
-
-
-            for (int d = 0; d < childrenNum; d++){
-                int dPos;
-                cin >> dPos;
-                dPos--;
-                nodes[vertex-1].children.push_back(&nodes[dPos]);
-                nodes[dPos].parent = true;
-            }
-
-        }
-        int x = 0;
-        while(x < n){
-            if (!nodes[x].parent){
-                cout << findMoves(&nodes[x]) << endl;
-                x++;
-                break;
-            }
-            else{
-                x++;
+            for (int child = 0; child < childrenNum; child++){
+                int childNum;
+                cin >> childNum;
+                vec[i].children.push_back(childNum);
+                findRoot.erase(remove(findRoot.begin(), findRoot.end(), childNum), findRoot.end());
             }
         }
+        int rootVertex = findRoot[0];
+        cout << findNecessaryMarbles(vec, rootVertex).first << endl;
+        
+        vec.clear();
+        findRoot.clear();
         cin >> n;
     }
 }
