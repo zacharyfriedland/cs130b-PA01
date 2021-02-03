@@ -45,6 +45,11 @@ int main(){
                         groupTwo.push_back(groupOne[s]);
                         // delete value from groupOne
                         groupOne.erase(remove(groupOne.begin(), groupOne.end(), groupOne[s]), groupOne.end());
+                        //perform check here
+                        // if(there is an enemy of groupOne[s])
+
+
+                        // ----------
                         s--;
                         iter = groupOne.size()+1;
                         count = 0;
@@ -62,14 +67,26 @@ int main(){
             }
         }
     }
-    // cout << "groupTwo: ";
     if(groupTwo.size() > 0){
         cout << "2" << endl;
+        for(int l = 0; l < groupOne.size(); l++){
+            cout << groupOne[l] << " ";
+        }
+        cout << endl;
+        for(int j = 0; j < groupTwo.size(); j++){
+            cout << groupTwo[j] << " ";
+        }
+        cout << endl;
     }
-    for(int j = 0; j < groupTwo.size(); j++){
-        cout << groupTwo[j] << " ";
+    else{
+        cout << "1" << endl;
+        for(int l = 0; l < groupOne.size(); l++){
+            cout << groupOne[l] << " ";
+        }
+        cout << endl;
     }
-    cout << endl;
+    
+    
 
     // for(int z = 0; z < enemies.size(); z++){
     //     cout << "Index: " << z << " Soldier: " << z+1 << " Enemies: ";
