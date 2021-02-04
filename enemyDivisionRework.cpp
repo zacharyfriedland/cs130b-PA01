@@ -1,4 +1,3 @@
-
 #include<cstdio>
 #include<vector>
 #include<iostream>
@@ -14,7 +13,7 @@ int main(){
     int n, m;
     scanf("%d %d", &n, &m);
     vector<vector<int>> g(n);
-    rep(i,0,m){                 // #define rep(i,a,b) for(__typeof(b) i = a; i < (b); i++)
+    for(int i = 0; i < m; i++){
         int a, b;
         scanf("%d %d", &a, &b);
         a=a-1;
@@ -23,29 +22,32 @@ int main(){
         g[b].push_back(a);
     }
 
-    vector<int> group(n,2);
-    vector<int> enemy(n,0);
-    rep(i,0,n){
+    vector<int> group(n, 2);
+    vector<int> enemy(n, 0);
+    for(int i = 0; i < n; i++){                 
         vector<int> cnt(3);
-        rep(j,0,g[i].size())
-        cnt[group[g[i][j]]]++;
+        for(int j = 0; j < g[i].size(); j++){
+            cnt[group[g[i][j]]]++;
+        }
 
         int color = 0, cur = i;
         if (cnt[0] > 1)
-        color = 1;
+            color = 1;
 
         while (true){
             group[cur] = color;
             int ncur = -1;
-            rep(j,0,g[cur].size())
-            if (group[g[cur][j]] == color){
-                enemy[cur]++;
-                if (++enemy[g[cur][j]] == 2){
-                    ncur = g[cur][j];
-                    rep(l,0,g[ncur].size())
-                    if (group[g[ncur][l]] == color){
-                        enemy[g[ncur][l]]--;
-                        enemy[ncur]--;
+            for(int j = 0; j < g[cur].size(); j++){              
+                if (group[g[cur][j]] == color){
+                    enemy[cur]++;
+                    if (++enemy[g[cur][j]] == 2){
+                        ncur = g[cur][j];
+                        for(int l = 0; l < g[ncur].size(); l++){
+                            if (group[g[ncur][l]] == color){
+                                enemy[g[ncur][l]]--;
+                                enemy[ncur]--;
+                            }
+                        }
                     }
                 }
             }
@@ -58,14 +60,17 @@ int main(){
     }
 
     vector<vector<int>> result(2);
-    rep(i,0,n)
-    result[group[i]].push_back(i);
+    for(int i = 0; i < n; i++){                      
+        result[group[i]].push_back(i);
+    }
     printf("%d\n", 1 + !result[1].empty());
-    rep(i,0,2) rep(j,0,result[i].size()){
-        printf("%d", result[i][j] + 1);
-        if (j + 1 < result[i].size())
-            printf(" ");
-        else
-            printf("\n");
+    for(int i = 0; i < 2; i++){         
+        for(int j = 0; j < result[i].size(); j++){
+            printf("%d", result[i][j] + 1);
+            if (j + 1 < result[i].size())
+                printf(" ");
+            else
+                printf("\n");
+        }
     }
 }
