@@ -1,149 +1,84 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <algorithm>
-
+#include<cstdio>
+#include<vector>
+#include<iostream>
 using namespace std;
 
 
-void switchGroups(int indexToBeMoved, vector<int>& from, vector<int>& destination){
-    destination.push_back(from[indexToBeMoved]);
-    from.erase(remove(from.begin(), from.end(), from[indexToBeMoved]), from.end());
-}
-
-// returns index of the culprit or -1 if not found
-int findOneEnemy(int origIndex, vector<int> v, vector<vector<int>> enemies){
-    for(int i = 0; i < v.size(); i++){
-        if(i != origIndex){
-            // if v[i] is one of the original index's enemies, return the index (it is the culprit)
-            if(find(enemies[v[origIndex]-1].begin(), enemies[v[origIndex]-1].end(), v[i]) != enemies[v[origIndex]-1].end()){
-                return i;
-            }
-        }
-    }
-    return -1;
-}
-
-bool findEnemies(int culpritIndex, vector<int> v, vector<vector<int>> enemies){
-    int count = 0;
-    for(int i = 0; i < v.size(); i++){
-        if(i != culpritIndex){
-            // if there is more than one enemy then we must move the culprit
-            if(find(enemies[v[culpritIndex]-1].begin(), enemies[v[culpritIndex]-1].end(), v[i]) != enemies[v[culpritIndex]-1].end()){
-                count++;
-                if(count > 1){
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-
 int main(){
-    int soldiers; // n 
-    int enemyPairs; // m (m lines)
-    cin >> soldiers >> enemyPairs;
-    vector<int> groupOne;
-    vector<int> groupTwo;
-    for(int i = 1; i <= soldiers; i++){
-        groupOne.push_back(i);
-    }
-    
-
-    vector<vector<int>> enemies(soldiers);
-    for(int j = 0; j < enemyPairs; j++){  
-        int pairOne, pairTwo;
-        cin >> pairOne >> pairTwo;
-        enemies[pairOne-1].push_back(pairTwo);
-        enemies[pairTwo-1].push_back(pairOne);
+    // n is soldiers, m is enemy pairs
+    int n, m;
+    scanf("%d %d", &n, &m);
+    // vector of vectors holds enemies of soliders
+    vector<vector<int>> enemyList(n);
+    for(int i = 0; i < m; i++){
+        // read in enemy pairs and put in respective index at array
+        int a, b;
+        scanf("%d %d", &a, &b);
+        a--;
+        b--;
+        // enemies are mutual
+        enemyList[a].push_back(b);
+        enemyList[b].push_back(a);
     }
 
-    for(int s = 0; s < groupOne.size(); s++){
-        int iter = 0;
-        int count = 0;
-        while(iter < groupOne.size()){
-            if(iter != s){
-                // if solider is found in groupOne[s] enemy list
-                if(find(enemies[groupOne[s]-1].begin(), enemies[groupOne[s]-1].end(), groupOne[iter]) != enemies[groupOne[s]-1].end()){
-                    // enemy count += 1
-                    count++;
-                    if(count > 1){
-                        // always starts from groupTwo to groupOne if switchback needed
-                        int fromGroupOne = -1;
-                        // put this value into groupTwo
-                        groupTwo.push_back(groupOne[s]);
-                        // delete value from groupOne
-                        groupOne.erase(remove(groupOne.begin(), groupOne.end(), groupOne[s]), groupOne.end());
-                        // findOneEnemy returns index of culprit = hasEnemy
-                        int hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
-                        bool enemyHasEnemies = false;
-                        if(hasEnemy >= 0){
-                            enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
-                        }
-                        while(enemyHasEnemies){
-                            if(fromGroupOne > 0){
-                                switchGroups(hasEnemy, groupOne, groupTwo);
-                                fromGroupOne *= -1;
-                                hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
-                                if(hasEnemy >= 0){
-                                    enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
-                                }
-                                else{
-                                    enemyHasEnemies = false;
-                                    hasEnemy = -1;
-                                }
-                            }
-                            else{
-                                switchGroups(hasEnemy, groupTwo, groupOne);
-                                fromGroupOne *= -1;
-                                hasEnemy = findOneEnemy(groupOne.size()-1, groupOne, enemies);
-                                if(hasEnemy >= 0){
-                                    enemyHasEnemies = findEnemies(hasEnemy, groupOne, enemies);
-                                }
-                                else{
-                                    enemyHasEnemies = false;
-                                    hasEnemy = -1;
-                                }
+    // keeps track of enemies in a group
+    vector<int> group(n, 2);
+    vector<int> enemy(n, 0);
+    for(int i = 0; i < n; i++){                 
+        vector<int> count(3);
+        for(int j = 0; j < enemyList[i].size(); j++){
+            count[group[enemyList[i][j]]]++;
+        }
+
+        int flag = 0;
+        // follow index
+        int current = i;
+        if (count[0] > 1){
+            flag = 1;
+        }
+        // keep checking until break
+        while (true){
+            // group[current] starts at 0 or 1 if count > 1
+            group[current] = flag;
+            int ncur = -1;
+            // check enemies at current solider
+            for(int j = 0; j < enemyList[current].size(); j++){              
+                if (group[enemyList[current][j]] == flag){
+                    enemy[current]++;
+                    // if two enemies exist then ncur = that index
+                    if (++enemy[enemyList[current][j]] == 2){
+                        ncur = enemyList[current][j];
+                        for(int x = 0; x < enemyList[ncur].size(); x++){
+                            if (group[enemyList[ncur][x]] == flag){
+                                enemy[enemyList[ncur][x]]--;
+                                enemy[ncur]--;
                             }
                         }
-                        fromGroupOne = -1;
-                        s--;
-                        iter = groupOne.size()+1;
-                        count = 0;
-                    }
-                    else{
-                        iter++;
                     }
                 }
-                else{
-                    iter++;
-                }
             }
-            else{
-                iter++;
+            // if two enemies did not exist then break out of while
+            if (ncur == -1){
+                break;
             }
+            current = ncur;
+            flag = !flag;
         }
-    }
-    if(groupTwo.size() > 0){
-        cout << "2" << endl;
-        for(int l = 0; l < groupOne.size(); l++){
-            cout << groupOne[l] << " ";
-        }
-        cout << endl;
-        for(int j = 0; j < groupTwo.size(); j++){
-            cout << groupTwo[j] << " ";
-        }
-        cout << endl;
-    }
-    else{
-        cout << "1" << endl;
-        for(int l = 0; l < groupOne.size(); l++){
-            cout << groupOne[l] << " ";
-        }
-        cout << endl;
     }
 
-    return 0;
+    // print result
+    vector<vector<int>> result(2);
+    for(int i = 0; i < n; i++){                      
+        result[group[i]].push_back(i);
+    }
+    printf("%d\n", 1 + !result[1].empty());
+    for(int i = 0; i < 2; i++){         
+        for(int j = 0; j < result[i].size(); j++){
+            printf("%d", result[i][j] + 1);
+            if (j + 1 < result[i].size())
+                printf(" ");
+            else
+                printf("\n");
+        }
+    }
 }
