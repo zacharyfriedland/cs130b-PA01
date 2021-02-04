@@ -26,7 +26,7 @@ int findOneEnemy(int origIndex, vector<int> v, vector<vector<int>> enemies){
 
 int findOneEnemy(int origIndex, vector<int> v, vector<vector<int>> enemies, int newIndex){
 	if(newIndex == 0){
-		return findOneEnemy(int origIndex, vector<int> v, vector<vector<int>> enemies);
+		return findOneEnemy(origIndex, v, enemies);
 	}
     for(int i = newIndex; i < v.size(); i++){
         if(i != origIndex){
@@ -78,54 +78,62 @@ int main(){
     for(int s = 0; s < groupOne.size(); s++){
         int count = 0;
 		int newIndex = 0;
+		int iter = 0;
 		// if enemy is found, update count by 1
-		if(findOneEnemy(s, groupOne, enemies, newIndex) >= 0){
-			// enemy count += 1
-			count++;
-			newIndex = findOneEnemy(s, groupOne, enemies, newIndex);
-			if(count > 1){
-				// always starts from groupTwo to groupOne if switchback needed
-				int fromGroupOne = -1;
-				// put this value into groupTwo
-				groupTwo.push_back(groupOne[s]);
-				// delete value from groupOne
-				groupOne.erase(remove(groupOne.begin(), groupOne.end(), groupOne[s]), groupOne.end());
-				// findOneEnemy returns index of culprit = hasEnemy
-				int hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
-				bool enemyHasEnemies = false;
-				if(hasEnemy >= 0){
-					enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
-				}
-				while(enemyHasEnemies){
-					if(fromGroupOne > 0){
-						switchGroups(hasEnemy, groupOne, groupTwo);
-						fromGroupOne *= -1;
-						hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
-						if(hasEnemy >= 0){
-							enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
+		while(iter < groupOne.size() ){
+			if(findOneEnemy(s, groupOne, enemies, newIndex) >= 0){
+				// enemy count += 1
+				count++;
+				newIndex = findOneEnemy(s, groupOne, enemies, newIndex);
+				if(count > 1){
+					// always starts from groupTwo to groupOne if switchback needed
+					int fromGroupOne = -1;
+					// put this value into groupTwo
+					groupTwo.push_back(groupOne[s]);
+					// delete value from groupOne
+					groupOne.erase(remove(groupOne.begin(), groupOne.end(), groupOne[s]), groupOne.end());
+					// findOneEnemy returns index of culprit = hasEnemy
+					int hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
+					bool enemyHasEnemies = false;
+					if(hasEnemy >= 0){
+						enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
+					}
+					while(enemyHasEnemies){
+						if(fromGroupOne > 0){
+							switchGroups(hasEnemy, groupOne, groupTwo);
+							fromGroupOne *= -1;
+							hasEnemy = findOneEnemy(groupTwo.size()-1, groupTwo, enemies);
+							if(hasEnemy >= 0){
+								enemyHasEnemies = findEnemies(hasEnemy, groupTwo, enemies);
+							}
+							else{
+								enemyHasEnemies = false;
+								hasEnemy = -1;
+							}
 						}
 						else{
-							enemyHasEnemies = false;
-							hasEnemy = -1;
+							switchGroups(hasEnemy, groupTwo, groupOne);
+							fromGroupOne *= -1;
+							hasEnemy = findOneEnemy(groupOne.size()-1, groupOne, enemies);
+							if(hasEnemy >= 0){
+								enemyHasEnemies = findEnemies(hasEnemy, groupOne, enemies);
+							}
+							else{
+								enemyHasEnemies = false;
+								hasEnemy = -1;
+							}
 						}
 					}
-					else{
-						switchGroups(hasEnemy, groupTwo, groupOne);
-						fromGroupOne *= -1;
-						hasEnemy = findOneEnemy(groupOne.size()-1, groupOne, enemies);
-						if(hasEnemy >= 0){
-							enemyHasEnemies = findEnemies(hasEnemy, groupOne, enemies);
-						}
-						else{
-							enemyHasEnemies = false;
-							hasEnemy = -1;
-						}
-					}
+					fromGroupOne = -1;
+					s--;
+					count = 0;
 				}
-				fromGroupOne = -1;
-				s--;
-				iter = groupOne.size()+1;
-				count = 0;
+				else{
+					iter = newIndex;
+				}
+			}
+			else{
+				iter++;
 			}
 		}
 	}
